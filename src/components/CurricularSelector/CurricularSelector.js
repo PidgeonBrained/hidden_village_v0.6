@@ -6,6 +6,7 @@ import { getCurricularList, writeToDatabaseGameSelect } from "../../firebase/dat
 import { CurricularSelectorBoxes } from "./CurricularSelectorModuleBoxes";
 import { useMachine } from "@xstate/react";
 import {Curriculum} from "../CurricularModule/CurricularModule";
+import { Text } from "@inlet/react-pixi"
 
 export let playGame = false; // keep track of whether the curricular content list is being used to edit or play games.
 
@@ -34,24 +35,15 @@ export function handlePIN(curricular, message = "Please Enter the PIN."){ // thi
   return false; // do nothing if cancel is clicked
 }
 
-function handleGameClicked(curricular, curricularCallback){
-  if(playGame){ // don't need a PIN to play the game
-    writeToDatabaseGameSelect(curricular["UUID"]);
-    Curriculum.setCurricularEditor(curricular);
-    curricularCallback();
-  }
-  else if(handlePIN(curricular) && !playGame){
-    Curriculum.setCurrentUUID(curricular["UUID"]);
-    Curriculum.setCurricularEditor(curricular);
-    curricularCallback();
-  }
-}
+
 
 const CurricularSelectModule = (props) => {
   
   const { height, width, mainCallback, curricularCallback} = props;
   const [curricularList, setCurricularList] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
+  const [selectedCurricular, setSelectedCurricular] = useState(null);  // Declare the state at the beginning of the component
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -80,6 +72,33 @@ const CurricularSelectModule = (props) => {
       setCurrentPage(currentPage - 1);
     }
   };
+  // handle ok button click
+
+  function handleOKButtonClicked(){
+    if (selectedCurricular) {
+      if (playGame) {
+        writeToDatabaseGameSelect(selectedCurricular["UUID"]);
+        Curriculum.setCurricularEditor(selectedCurricular);
+        curricularCallback();  // Open the game
+      } else if (handlePIN(selectedCurricular) && !playGame) {
+        Curriculum.setCurrentUUID(selectedCurricular["UUID"]);
+        Curriculum.setCurricularEditor(selectedCurricular);
+        curricularCallback();  // Open the game editor
+      }
+    } else {
+      alert("No curricular selected. Please select one before clicking OK.");
+    }
+  }
+
+
+  // Handle game clicked 
+
+  function handleGameClicked(curricular, curricularCallback){
+    setSelectedCurricular(curricular);
+    
+  }
+
+
 
   // use to determine the subset of games to display based on the current page
   const startIndex = currentPage * curricularPerPage;
@@ -96,12 +115,12 @@ const CurricularSelectModule = (props) => {
             width={totalWidth * 0.8}
             x={totalWidth * (xMultiplier-0.08)}
             y={totalHeight * index * 4 * fontSizeMultiplier + totalHeight * yMultiplier * 0.75}
-            color={white}
+            color={selectedCurricular === curricular ? neonGreen : white} /* Highlight selected */
             fontSize={totalWidth * fontSizeMultiplier/1.3}
-            fontColor={blue}
+            fontColor={selectedCurricular === curricular ? black : blue} /* Change text color */
             text={curricular["CurricularAuthor"]}
             fontWeight="bold"
-            callback = {() => {handleGameClicked(curricular, curricularCallback)}}
+            callback = {() => handleGameClicked(curricular, curricularCallback)}
           />
         ))}
 
@@ -112,12 +131,12 @@ const CurricularSelectModule = (props) => {
             width={totalWidth * 0.6}
             x={totalWidth * (xMultiplier + 0.25)}
             y={totalHeight * index * 4 * fontSizeMultiplier + totalHeight * yMultiplier * 0.75}
-            color={white}
+            color={selectedCurricular === curricular ? neonGreen : white}
             fontSize={totalWidth * fontSizeMultiplier / 1.3} 
-            fontColor={blue}
+            fontColor={selectedCurricular === curricular ? black : blue} /* Change text color */
             text={curricular["CurricularName"]}
             fontWeight="bold"
-            callback = {() => {handleGameClicked(curricular, curricularCallback)}}
+            callback = {() => handleGameClicked(curricular, curricularCallback)}
           />
         
         ))}
@@ -129,12 +148,12 @@ const CurricularSelectModule = (props) => {
             width={totalWidth * 0.8}
             x={totalWidth * (xMultiplier +0.5)} 
             y={totalHeight * index * 4 * fontSizeMultiplier + totalHeight * yMultiplier * 0.75} 
-            color={white}
+            color={selectedCurricular === curricular ? neonGreen : white} /* Highlight selected */
             fontSize={totalWidth * fontSizeMultiplier / 1.3}
             fontColor={blue}
             text={curricular["CurricularKeywords"]}
             fontWeight="bold"
-            callback = {() => {handleGameClicked(curricular, curricularCallback)}}
+            callback = {() => handleGameClicked(curricular, curricularCallback)}
           />
         ))}
 
@@ -146,12 +165,12 @@ const CurricularSelectModule = (props) => {
               width={totalWidth * (xMultiplier * 0.85 )}
               x={totalWidth * xMultiplier - totalWidth * xMultiplier * 0.95}
               y={totalHeight * index * 4 * fontSizeMultiplier + totalHeight * yMultiplier * 0.75 }
-              color={white}
+              color={selectedCurricular === curricular ? neonGreen : white} /* Highlight selected */
               fontSize={totalWidth * fontSizeMultiplier / 1.3}
-              fontColor={blue}
+              fontColor={selectedCurricular === curricular ? black : blue} /* Change text color */
               text={curricular["isFinal"] ? "X" : " "}
               fontWeight="bold"
-              callback = {() => {handleGameClicked(curricular, curricularCallback)}}
+              callback = {() => handleGameClicked(curricular, curricularCallback)}
             />
           ))
             
@@ -164,6 +183,21 @@ const CurricularSelectModule = (props) => {
   return (
     <>
       <Background height={height * 1.1} width={width} />
+      {selectedCurricular && (
+      <Text
+        text={`Game Selected: ${selectedCurricular["CurricularName"]}`}
+        x={width * 0.2}  // Adjust the x-position 
+        y={height * 0.1}  // Adjust the y-position 
+        style={
+          new PIXI.TextStyle({
+            fill: "green",
+            fontSize: 24,  // Adjust the font size 
+            fontWeight: "bold",
+          })
+        }
+      />
+    )}
+
 
       <RectButton
         height={height * 0.13}
@@ -213,7 +247,8 @@ const CurricularSelectModule = (props) => {
         fontColor={white}
         text={"OK"}
         fontWeight={800}
-        callback={null}
+        callback={handleOKButtonClicked} // Attach the OK button callback
+        disabled={!selectedCurricular}  // Disable the button until a game is selected
       />
 
       <CurricularSelectorBoxes height={height} width={width} />

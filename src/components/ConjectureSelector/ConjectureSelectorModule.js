@@ -35,26 +35,14 @@ export function handlePIN(conjecture, message = "Please Enter the PIN."){ // thi
   return false; // do nothing if cancel is clicked
 }
 
-function handleLevelClicked(conjecture, conjectureCallback){
-  if(addToCurricular){ // if the user wants to preview a level before adding it to the game in the game editor
-    setEditLevel(false);
-    setGoBackFromLevelEdit("LEVELSELECT");
-    currentConjecture.setConjecture(conjecture);
-    conjectureCallback(conjecture);
-  }
-  else if(handlePIN(conjecture)){ // when the user pulls up the list of levels in the level editor
-    setEditLevel(true);
-    setGoBackFromLevelEdit("MAIN");
-    currentConjecture.setConjecture(conjecture);
-    conjectureCallback(conjecture);
-  }
-}
+
 
 const ConjectureSelectModule = (props) => {
   
   const { height, width, conjectureCallback, backCallback, curricularCallback} = props;
   const [conjectureList, setConjectureList] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
+  const [selectedConjecture, setSelectedConjecture] = useState(null); // State to track the selected conjecture
 
   useEffect(() => {
     const fetchData = async () => {
@@ -68,6 +56,29 @@ const ConjectureSelectModule = (props) => {
 
     fetchData();
   }, []);
+  // funcation that handel "OK" buttton click and open the selected game 
+
+  const handleOKButtonClicked = () => {
+    if (selectedConjecture) {
+      console.log("Opening selected conjecture:", selectedConjecture);    
+      startGame(selectedConjecture); // Call the function that initiates the game
+    } else {
+      alert("No game selected. Please select a game before clicking OK.");
+    }
+  };
+
+  const startGame = (conjecture) => {
+    // Game logic to open the selected conjecture
+    console.log("Starting the game with:", conjecture);
+    conjectureCallback(conjecture); // Call the callback to initialize the game
+  };
+
+  const handleLevelClicked=(conjecture) => {
+    setSelectedConjecture(conjecture); // Set the selected conjecture when clicked
+    // No game logic here, just selection and highlighting.
+  }
+
+
 
   //use to get a fixed number of conjectures per page and to navigate between the pages
   const conjecturesPerPage = 7;
@@ -96,7 +107,7 @@ const ConjectureSelectModule = (props) => {
     }
     
   };
-
+ 
   // use to determine the subset of conjectures to display based on the current page
   const startIndex = currentPage * conjecturesPerPage;
   const currentConjectures = conjectureList.slice(startIndex, startIndex + conjecturesPerPage);
@@ -112,12 +123,12 @@ const ConjectureSelectModule = (props) => {
             width={totalWidth * 0.8}
             x={totalWidth * (xMultiplier-0.08)}
             y={totalHeight * index * 4 * fontSizeMultiplier + totalHeight * yMultiplier * 0.75}
-            color={white}
+            color={selectedConjecture === conjecture ? neonGreen : white} // Highlight selected conjecture
             fontSize={totalWidth * fontSizeMultiplier/1.3}
-            fontColor={blue}
+            fontColor={selectedConjecture === conjecture ? black : blue}
             text={conjecture["Text Boxes"]["Author Name"]}
             fontWeight="bold"
-            callback = {() => handleLevelClicked(conjecture, conjectureCallback)}
+            callback = {() => handleLevelClicked(conjecture)}
           />
         ))}
 
@@ -128,12 +139,12 @@ const ConjectureSelectModule = (props) => {
             width={totalWidth * 0.6}
             x={totalWidth * (xMultiplier + 0.25)}
             y={totalHeight * index * 4 * fontSizeMultiplier + totalHeight * yMultiplier * 0.75}
-            color={white}
+            color={selectedConjecture === conjecture ? neonGreen : white}
             fontSize={totalWidth * fontSizeMultiplier / 1.3} 
-            fontColor={blue}
+            fontColor={selectedConjecture === conjecture ? black : blue}
             text={conjecture["Text Boxes"]["Conjecture Name"]}
             fontWeight="bold"
-            callback = {() => handleLevelClicked(conjecture, conjectureCallback)}
+            callback = {() => handleLevelClicked(conjecture)}
           />
         
         ))}
@@ -145,12 +156,12 @@ const ConjectureSelectModule = (props) => {
             width={totalWidth * 0.8}
             x={totalWidth * (xMultiplier +0.5)} 
             y={totalHeight * index * 4 * fontSizeMultiplier + totalHeight * yMultiplier * 0.75} 
-            color={white}
+            color={selectedConjecture === conjecture ? neonGreen : white}
             fontSize={totalWidth * fontSizeMultiplier / 1.3}
-            fontColor={blue}
+            fontColor={selectedConjecture === conjecture ? black : blue}
             text={conjecture["Text Boxes"]["Conjecture Keywords"]}
             fontWeight="bold"
-            callback = {() => handleLevelClicked(conjecture, conjectureCallback)}
+            callback = {() => handleLevelClicked(conjecture)}
           />
         ))}
 
@@ -187,7 +198,7 @@ const ConjectureSelectModule = (props) => {
               fontColor={blue}
               text={conjecture["isFinal"] ? "X" : " "}
               fontWeight="bold"
-              callback = {() => handleLevelClicked(conjecture, conjectureCallback)}
+              callback = {() => handleLevelClicked(conjecture)}
             />
           ))
             
@@ -211,6 +222,8 @@ const ConjectureSelectModule = (props) => {
   return (
     <>
       <Background height={height * 1.1} width={width} />
+
+      
 
       <RectButton
         height={height * 0.13}
@@ -286,7 +299,8 @@ const ConjectureSelectModule = (props) => {
         fontColor={white}
         text={"OK"}
         fontWeight={800}
-        callback={null}
+        callback={handleOKButtonClicked} // Attach the OK button callback
+        disabled={!selectedConjecture} // Disable the button until a game is selected
       />
 
       <ConjectureSelectorBoxes height={height} width={width} />
@@ -296,4 +310,4 @@ const ConjectureSelectModule = (props) => {
 };
 
 
-export default ConjectureSelectModule; 
+export default ConjectureSelectModule;                                                                                      
