@@ -125,7 +125,7 @@ export const PINBox = (props) => {
         x={width * 0.6910}
         y={height * 0.085}
         color={white}
-        fontSize={width * 0.015}
+        fontSize={width * 0.013}
         fontColor={black}
         text={
           localStorage.getItem('PIN') || ' ' // Show existing PIN if available

@@ -48,8 +48,8 @@ const InputBox = (props) => {
         }
         interactive={true}
         pointerdown={callback}
-        x={x} // Left alignment
-        y={y+6} // Adjusted to start at the top of the rectangle
+        x={x+2.5} // Left alignment
+        y={y+4} // Adjusted to start at the top of the rectangle
         anchor={-0.017} // Anchor set to 0 for left alignment
       />
     </>
