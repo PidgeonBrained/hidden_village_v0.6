@@ -7,8 +7,8 @@ import { TextStyle } from "@pixi/text";
 import InputBox from "../InputBox";
 import { Input } from 'postcss';
 import { useEffect, useRef } from 'react';
-import PixiTextInput from '../PixiTextInput';
 import { userEmail } from "firebase/database"; //Doesnt work?
+import PixiTextInput from "../../PixiTextInput";
 
 const DataMenu = (props) => {
   const {
@@ -38,6 +38,22 @@ const DataMenu = (props) => {
     fontWeight: 1000,                 
     fill: [black],                      
   })
+
+  const options = {
+    input: {
+      fontSize: '16px',
+      padding: '10px',
+      width: '200px',
+      color: '#26272E',
+      backgroundColor: '#DDDDDD',
+      borderRadius: '5px'
+    },
+    box: {
+      default: { fill: 0xFFFFFF, rounded: 12 },
+      focused: { fill: 0xAAAAAA, rounded: 12 },
+      disabled: { fill: 0xDDDDDD, rounded: 12 }
+    }
+  }
 
   const draw = useCallback(
     (g) => {
@@ -108,6 +124,7 @@ const DataMenu = (props) => {
         anchor={0}
       />
       <PixiTextInput
+      options={options}
         height={inputBoxHeight}
         width={(innerRectWidth - distanceFromFieldTextToField - fieldTextMarginsFromInnerRect * 2)}
         x={x + innerRectMargins + fieldTextMarginsFromInnerRect + distanceFromFieldTextToField}
