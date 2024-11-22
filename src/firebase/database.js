@@ -56,7 +56,7 @@ const formatDate = (date) => {
 // Define data keys for the text inputs of conjectures
 export const keysToPush = [
   "Conjecture Name",
-  "Author Name",
+  //"Author Name",
   "PIN",
   "Conjecture Keywords",
   "Conjecture Description",
@@ -236,6 +236,8 @@ export const writeToDatabaseConjecture = async (existingUUID) => {
       set(ref(db, `${conjecturePath}/isFinal`), true),
       set(ref(db,`${conjecturePath}/Search Words`), searchWordsToPushToDatabase),
       set(ref(db, `${conjecturePath}/Name`), dataToPush["Conjecture Name"]),
+      // auto set author to logged in user
+      //set(ref(db, `${conjecturePath}/Author`), userName),
     ];
 
     return promises && alert("Conjecture successfully published to database.");
@@ -300,6 +302,8 @@ export const writeToDatabaseConjectureDraft = async (existingUUID) => {
     set(ref(db, `${conjecturePath}/Text Boxes`), dataToPush),
     set(ref(db, `${conjecturePath}/UUID`),conjectureID),
     set(ref(db, `${conjecturePath}/isFinal`), false),
+    // auto set author to logged in user
+    //set(ref(db, `${conjecturePath}/Author`), userName)
   ];
 
   return promises && alert("Draft saved");
@@ -446,6 +450,8 @@ export const writeToDatabaseCurricularDraft = async (UUID) => {
     set(ref(db, `${CurricularPath}/Time`), timestamp),
     set(ref(db, `${CurricularPath}/UUID`), CurricularID),
     set(ref(db, `${CurricularPath}/isFinal`), false),
+    // auto set author for security
+    set(ref(db, `${CurricularPath}/Author`), userName),
   ];
 
   return promises && alert("Game Draft saved");
@@ -506,6 +512,8 @@ export const writeToDatabaseCurricular = async (UUID) => {
     set(ref(db, `${CurricularPath}/Time`), timestamp),
     set(ref(db, `${CurricularPath}/UUID`), CurricularID),
     set(ref(db, `${CurricularPath}/isFinal`), true),
+    // auto set author for security
+    set(ref(db, `${CurricularPath}/Author`), userName)
   ];
 
   return alert("Game Published"), promises; //returns the promises and alerts that the game has been published
@@ -881,27 +889,40 @@ export const writeToDatabaseInsightEnd = async () => {
 export const getFromDatabaseByGame = async (selectedGame, selectedStart, selectedEnd) => {
   try {
     // Create reference to the realtime database
-    const dbRef = ref(db, `_PoseData/${selectedGame}`);
+    const posedbRef = ref(db, `_PoseData/${selectedGame}`);
+    const eventdbRef = ref(db, `_GameID/${selectedGame}`);
 
     // Query to find data
-    const q = query(dbRef, orderByKey(), startAt(selectedStart), endAt(selectedEnd));
-    
+    const poseq = query(posedbRef, orderByKey(), startAt(selectedStart), endAt(selectedEnd));
+    const eventq = query(eventdbRef, orderByKey(), startAt(selectedStart), endAt(selectedEnd));
     // Execute the query
-    const querySnapshot = await get(q);
+    const poseQuerySnapshot = await get(poseq);
+    const eventQuerySnapshot = await get(eventq);
 
     // Check if data in snapshot exists
-    if (querySnapshot.exists()) {
-      const data = querySnapshot.val();
-      console.log('Data:', data);
+    if (poseQuerySnapshot.exists() && eventQuerySnapshot.exists()) {
+      const poseData = poseQuerySnapshot.val();
+      const eventData = eventQuerySnapshot.val();
+      //console.log('Data:', poseData);
       
-      // Convert to JSON and download
-      const jsonStr = JSON.stringify(data, null, 2);
-      const downloadLink = document.createElement('a');
-      downloadLink.setAttribute('href', 'data:text/json;charset=utf-8,' + encodeURIComponent(jsonStr));
-      downloadLink.setAttribute('download', 'pose_data.json');
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      document.body.removeChild(downloadLink);
+      // Convert event log to JSON and download
+      const eventjsonStr = JSON.stringify(eventData, null, 2);
+      const eventDownload = document.createElement('a');
+      eventDownload.setAttribute('href', 'data:text/json;charset=utf-8,' + encodeURIComponent(eventjsonStr));
+      eventDownload.setAttribute('download', 'event_log.json');
+      document.body.appendChild(eventDownload);
+      eventDownload.click();
+      document.body.removeChild(eventDownload);
+
+      // Convert pose data to JSON and download (takes longer)
+      const posejsonStr = JSON.stringify(poseData, null, 2);
+      const poseDownload = document.createElement('a');
+      poseDownload.setAttribute('href', 'data:text/json;charset=utf-8,' + encodeURIComponent(posejsonStr));
+      poseDownload.setAttribute('download', 'pose_data.json');
+      document.body.appendChild(poseDownload);
+      poseDownload.click();
+      document.body.removeChild(poseDownload);
+      
     } else {
       return null; // This will happen if data not found
     }
