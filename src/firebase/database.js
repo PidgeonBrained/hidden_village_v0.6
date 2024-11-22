@@ -899,6 +899,10 @@ export const getFromDatabaseByGame = async (selectedGame, selectedStart, selecte
     const poseQuerySnapshot = await get(poseq);
     const eventQuerySnapshot = await get(eventq);
 
+    const formattedStart = selectedStart.replace(/[^a-zA-Z0-9]/g, '_');
+    const formattedEnd = selectedEnd.replace(/[^a-zA-Z0-9]/g, '_');
+    const formattedGame = selectedGame.replace(/[^a-zA-Z0-9]/g, '_');
+
     // Check if data in snapshot exists
     if (poseQuerySnapshot.exists() && eventQuerySnapshot.exists()) {
       const poseData = poseQuerySnapshot.val();
@@ -909,7 +913,7 @@ export const getFromDatabaseByGame = async (selectedGame, selectedStart, selecte
       const eventjsonStr = JSON.stringify(eventData, null, 2);
       const eventDownload = document.createElement('a');
       eventDownload.setAttribute('href', 'data:text/json;charset=utf-8,' + encodeURIComponent(eventjsonStr));
-      eventDownload.setAttribute('download', 'event_log.json');
+      eventDownload.setAttribute('download', `${formattedGame}_event_log_${formattedStart}_to_${formattedEnd}.json`);
       document.body.appendChild(eventDownload);
       eventDownload.click();
       document.body.removeChild(eventDownload);
@@ -918,7 +922,7 @@ export const getFromDatabaseByGame = async (selectedGame, selectedStart, selecte
       const posejsonStr = JSON.stringify(poseData, null, 2);
       const poseDownload = document.createElement('a');
       poseDownload.setAttribute('href', 'data:text/json;charset=utf-8,' + encodeURIComponent(posejsonStr));
-      poseDownload.setAttribute('download', 'pose_data.json');
+      poseDownload.setAttribute('download', `${formattedGame}_pose_data_${formattedStart}_to_${formattedEnd}.json`);
       document.body.appendChild(poseDownload);
       poseDownload.click();
       document.body.removeChild(poseDownload);
