@@ -2,8 +2,8 @@
 export async function convertJsonToCsv(jsonFile) {
     try {
         // Read JSON file content
-        const fileContent = await jsonFile.text();
-        const jsonData = JSON.parse(fileContent);
+        // const fileContent = await jsonFile.text();
+        const jsonData = JSON.parse(jsonFile);
         
         // Headers for CSV
         const headers = [
@@ -66,7 +66,7 @@ export async function convertJsonToCsv(jsonFile) {
         link.click();
         URL.revokeObjectURL(url);
 
-        return { success: true, rowCount: rows.length };
+        return { success: true, rowCount: rows.length, csvContent: csvContent };
     } catch (error) {
         console.error('Conversion failed:', error);
         throw new Error(`Failed to convert file: ${error.message}`);

@@ -5,6 +5,7 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { Curriculum } from "../components/CurricularModule/CurricularModule";
 import { parse } from "querystring-es3";
 
+import { convertJsonToCsv, } from "../firebase/jsonTOcsv.js";
 
 // Import the uuid library
 const { v4: uuidv4 } = require('uuid');
@@ -909,7 +910,7 @@ export const getFromDatabaseByGame = async (selectedGame, selectedStart, selecte
       const eventData = eventQuerySnapshot.val();
       //console.log('Data:', poseData);
       
-      // Convert event log to JSON and download
+      // // Convert event log to JSON and download
       const eventjsonStr = JSON.stringify(eventData, null, 2);
       const eventDownload = document.createElement('a');
       eventDownload.setAttribute('href', 'data:text/json;charset=utf-8,' + encodeURIComponent(eventjsonStr));
@@ -926,6 +927,19 @@ export const getFromDatabaseByGame = async (selectedGame, selectedStart, selecte
       document.body.appendChild(poseDownload);
       poseDownload.click();
       document.body.removeChild(poseDownload);
+
+      // const eventjsonTOcsv = JSON.parse(eventjsonStr);
+      const result = await convertJsonToCsv(eventjsonStr);
+      // if(result.success) {
+      //   const eventcsv = new Blob([result], { type: "text/csv" });
+      //   const url = URL.createObjectURL(eventcsv);
+
+      //   const csvDownload = document.createElement("a");
+      //   csvDownload.href = url;
+      //   csvDownload.download = `${formattedGame}_event_log_${formattedStart}_to_${formattedEnd}.csv`; // Default file name
+      //   csvDownload.click();
+      //   URL.revokeObjectURL(url);
+      // }
       
     } else {
       return null; // This will happen if data not found
