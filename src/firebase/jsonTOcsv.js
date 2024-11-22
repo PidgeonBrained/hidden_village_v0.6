@@ -2,7 +2,8 @@ const fs = require("fs");
 const os = require("os");
 const path = require("path");
 
-function extractPoses(conjectureData, gameId, userId, role, timestamp) {
+// Function to extract poses from conjecture data
+export function extractPoses(conjectureData, gameId, userId, role, timestamp) {
     const rows = [];
     for (const [pose, details] of Object.entries(conjectureData)) {
         rows.push({
@@ -20,8 +21,8 @@ function extractPoses(conjectureData, gameId, userId, role, timestamp) {
     }
     return rows;
 }
-
-function mapAndConvertToCSV(jsonData) {
+// Function to map JSON data and convert to CSV
+export function mapAndConvertToCSV(jsonData) {
     const rows = [];
     const headers = [
         "UTC Time",
@@ -35,7 +36,7 @@ function mapAndConvertToCSV(jsonData) {
         "Pose",
         "Start Match",
     ];
-
+    // Extract poses from JSON data and add to rows
     for (const [gameName, gameDetails] of Object.entries(jsonData)) {
         const curricularId = gameDetails.CurricularID || "null";
         for (const [date, dateDetails] of Object.entries(gameDetails)) {
@@ -64,7 +65,7 @@ function mapAndConvertToCSV(jsonData) {
         }
     }
 
-    // Create CSV content
+    // Create CSV content from rows
     const csvContent =
         headers.join(",") +
         "\n" +
@@ -82,8 +83,8 @@ function mapAndConvertToCSV(jsonData) {
     console.log(`CSV file saved to ${outputPath}`);
 }
 
-// Main function
-function main() {
+// Main function to load JSON file and convert to CSV
+export function main() {
     const inputFilePath = "C:/Users/adamc/Downloads/exported-json-data-2024-11-03T21-19-02.293Z.json"; // Update to your local JSON file path
 
     // Load JSON file
