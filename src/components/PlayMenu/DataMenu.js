@@ -118,7 +118,7 @@ const DataMenu = (props) => {
       />
       
       <Text
-        text={"USER ID"}                             
+        text={"USER ID"}
         style={fieldText}
         x={x + innerRectMargins + fieldTextMarginsFromInnerRect} 
         y={y + menuHeight - innerRectMargins - innerRectHeight + fieldTextMarginsFromInnerRect}
@@ -166,7 +166,7 @@ const DataMenu = (props) => {
           let gameValid = await checkGameAuthorization(promptVal);
          // console.log(gameValid);
           while (promptVal != null && gameValid != true) {
-            promptVal = prompt("Invalid Game Name. Please try again", game_name);
+            promptVal = prompt(`Invalid Game Name. Please try again. Enter a Game from the following list\n\n${gameOptions}\n\n`, game_name);
             gameValid = await checkGameAuthorization(promptVal);
             //console.log(gameValid);
           }
