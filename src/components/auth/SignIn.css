@@ -8,6 +8,7 @@
   min-height: 40vh;
   min-width: 40%;
   overflow: hidden;
+ 
 }
 
 .login-inputs {
@@ -67,4 +68,43 @@
   max-width: 3rem;
   transform: rotate(25deg);
   bottom: 1rem;
+}
+.create-account-button {
+  color: #cbd111;
+  border: none;
+  background-color: transparent;
+  text-transform: uppercase;
+  font-weight: bold;
+  margin-top: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  transition: background-color 0.3s;
+  
+  
+  
+}
+
+.create-account-button:hover {
+  background-color: #facf5a;
+  color: white;
+}
+.create-account-input {
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  border: 1px solid #ccc;
+}
+.create-account-submit, .back-to-login-button {
+  background-color: #facf5a;
+  color: #2080d5;
+  font-weight: bold;
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+.back-to-login-button {
+  background-color: transparent;
+  color: white;
+  border: 1px solid white;
 }
