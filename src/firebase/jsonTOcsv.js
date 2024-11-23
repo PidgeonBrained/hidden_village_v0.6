@@ -1,8 +1,9 @@
 
+
 export async function convertJsonToCsv(jsonFile) {
     try {
         // Read JSON file content
-        // const fileContent = await jsonFile.text();
+        //const fileContent = await jsonFile.text();
         const jsonData = JSON.parse(jsonFile);
         
         // Headers for CSV
@@ -16,8 +17,6 @@ export async function convertJsonToCsv(jsonFile) {
             "DA Rep",
             "HINTS",
             "Hint Count",
-            "latin Square Order",
-            "Hint Order",
             "Conj",
             "ETSS",
             "ETSLO",
@@ -32,18 +31,49 @@ export async function convertJsonToCsv(jsonFile) {
 
         // Process data
         const rows = [];
-        for (const [gameName, gameDetails] of Object.entries(jsonData)) {
-            const curricularId = gameDetails.CurricularID ?? "null";
-            
-            for (const [date, dateDetails] of Object.entries(gameDetails)) {
-                if (typeof dateDetails === "object") {
-                    for (const [role, roleDetails] of Object.entries(dateDetails)) {
-                        const userId = roleDetails.UserId ?? "null";
-                        
-                        for (const [timestamp, sessionDetails] of Object.entries(roleDetails)) {
-                            if (typeof sessionDetails === "object") {
-                                const conjectureData = sessionDetails.ConjectureId ?? {};
-                                rows.push(...extractPoses(conjectureData, curricularId, userId, role, timestamp));
+        // process nested structure
+        for (const [date, dateData] of Object.entries(jsonData)) {
+            for (const [role, roleData] of Object.entries(dateData)) {
+                const userId = roleData.UserId ?? "null";
+                
+                for (const [timestamp, sessionData] of Object.entries(roleData)) {
+                    if (timestamp === "UserId") continue; // Skip UserId entry
+                    
+                    // Extract game-level data
+                    const daRep = sessionData.DaRep ?? "null";
+                    const hintCount = sessionData.Hints?.HintCount ?? "null";
+                    const latinSquareOrder = sessionData.LatinSquareOrder ?? "null";
+                    
+                    // Process each pose session
+                    for (const [sessionId, sessionDetails] of Object.entries(sessionData)) {
+                        if (sessionId === "DaRep" || sessionId === "GameStart" || 
+                            sessionId === "GameStartGMT" || sessionId === "Hints" || 
+                            sessionId === "LatinSquareOrder") continue;
+                            
+                        // Process poses
+                        for (const [poseName, poseDetails] of Object.entries(sessionDetails)) {
+                            if (poseName.startsWith("Pose") || poseName === "Intuition") {
+                                rows.push({
+                                    "UTC Time": poseDetails.StartGMT ?? "null",
+                                    "Unix Time Stamp": poseDetails.Start ?? "null",
+                                    "ID": userId,
+                                    "ROLE": role,
+                                    "GAME ID": sessionId,
+                                    "GAME MODE": "default_mode",
+                                    "DA Rep": daRep,
+                                    "HINTS": "null",
+                                    "Hint Count": hintCount,
+                                    "Conj": "null",
+                                    "ETSS": "null",
+                                    "ETSLO": latinSquareOrder,
+                                    "Event Type": "null",
+                                    "TF Given Answer": "null",
+                                    "TF Correct": "null",
+                                    "MC Given Answer": "null",
+                                    "MC Correct": "null",
+                                    "Pose": poseName,
+                                    "Start Match": poseDetails.MatchGMT ?? "null"
+                                });
                             }
                         }
                     }
@@ -73,31 +103,31 @@ export async function convertJsonToCsv(jsonFile) {
     }
 }
 
-function extractPoses(conjectureData, gameId, userId, role, timestamp) {
-    return Object.entries(conjectureData).map(([pose, details]) => ({
-        "UTC Time": details.StartUTC ?? "null",
-        "Unix Time Stamp": details.Start ?? "null",
-        "ID": userId,
-        "ROLE": role,
-        "GAME ID": gameId,
-        "GAME MODE": "default_mode",
-        "DA Rep": "null",
-        "HINTS": "null",
-        "Hint Count": "null",
-        "latin Square Order": "null",
-        "Hint Order": "null",
-        "Conj": "null",
-        "ETSS": "null",
-        "ETSLO": "null",
-        "Event Type": "null",
-        "TF Given Answer": "null",
-        "TF Correct": "null",
-        "MC Given Answer": "null",
-        "MC Correct": "null",
-        "Pose": pose,
-        "Start Match": details.MatchUTC ?? "null"
-    }));
-}
+// function extractPoses(conjectureData, gameId, userId, role, timestamp) {
+//     return Object.entries(conjectureData).map(([pose, details]) => ({
+//         "UTC Time": details.StartUTC ?? "null",
+//         "Unix Time Stamp": details.Start ?? "null",
+//         "ID": userId,
+//         "ROLE": role,
+//         "GAME ID": gameId,
+//         "GAME MODE": "default_mode",
+//         "DA Rep": "null",
+//         "HINTS": "null",
+//         "Hint Count": "null",
+//         "Conj": "null",
+//         "ETSS": "null",
+//         "ETSLO": "null",
+//         "Event Type": "null",
+//         "TF Given Answer": "null",
+//         "TF Correct": "null",
+//         "MC Given Answer": "null",
+//         "MC Correct": "null",
+//         "Pose": pose,
+//         "Start Match": details.MatchUTC ?? "null"
+//     }));
+// }
+
+
 
 // const fs = require("fs");
 // const os = require("os");
