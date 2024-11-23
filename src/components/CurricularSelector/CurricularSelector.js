@@ -3,12 +3,13 @@ import Background from "../Background";
 import { blue, white, red, neonGreen,green, black } from "../../utils/colors";
 import RectButton from "../RectButton";
 import { getCurricularList, writeToDatabaseGameSelect, writeToDatabaseNewSession } from "../../firebase/database";
-import { getUserNameFromDatabase } from "../../firebase/userDatabase";
+import { getUserNameFromDatabase, getUserRoleFromDatabase } from "../../firebase/userDatabase";
 import { CurricularSelectorBoxes } from "./CurricularSelectorModuleBoxes";
 import { useMachine } from "@xstate/react";
 import {Curriculum} from "../CurricularModule/CurricularModule";
 
 export let playGame = false; // keep track of whether the curricular content list is being used to edit or play games.
+
 
 export function getPlayGame() {
   return playGame;
@@ -38,8 +39,6 @@ export function handlePIN(curricular, message = "Please Enter the PIN."){ // thi
 function handleGameClicked(curricular, curricularCallback){
   if(playGame){ // don't need a PIN to play the game
     // write in a new session of the game to firebase
-    const name = getUserNameFromDatabase();
-    writeToDatabaseNewSession(curricular["UUID"], curricular["CurricularName"]);
     Curriculum.setCurricularEditor(curricular);
     curricularCallback();
   }
@@ -54,6 +53,7 @@ const CurricularSelectModule = (props) => {
   
   const { height, width, mainCallback, curricularCallback} = props;
   const [curricularList, setCurricularList] = useState([]);
+  const [userRole, setUserRole] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
 
   useEffect(() => {
@@ -61,6 +61,8 @@ const CurricularSelectModule = (props) => {
       try {
         const result = await getCurricularList(getPlayGame());
         setCurricularList(result);
+        const role = await getUserRoleFromDatabase();
+        setUserRole(role);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -104,7 +106,10 @@ const CurricularSelectModule = (props) => {
             fontColor={blue}
             text={curricular["CurricularAuthor"]}
             fontWeight="bold"
-            callback = {() => {handleGameClicked(curricular, curricularCallback)}}
+            callback = {() => {
+              handleGameClicked(curricular, curricularCallback);
+              writeToDatabaseNewSession(curricular["UUID"], curricular["CurricularName"], userRole);
+            }}
           />
         ))}
 

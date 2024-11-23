@@ -19,6 +19,7 @@ const auth = getAuth();
 let userId;
 let userEmail;
 let userName;
+let userRole;
 let date;
 let readableDate;
 let loginTime;
@@ -726,7 +727,7 @@ export const searchConjecturesByWord = async (searchWord) => {
 
 
 // Write a new game select into database under gameid>>date>>studentid>>sessionid
-export const writeToDatabaseNewSession = async (CurrId, CurrName) => {
+export const writeToDatabaseNewSession = async (CurrId, CurrName, role) => {
   // Create a new date object to get a timestamp and readable timestamp
   const dateObj = new Date();
   const timestamp = dateObj.toISOString();
@@ -734,6 +735,7 @@ export const writeToDatabaseNewSession = async (CurrId, CurrName) => {
  
   // Change game ID appropriately
   gameId = CurrName;
+  userRole = role;
 
   // Create a reference path to the Firebase Realtime Database
   const userSession = `_GameID/${gameId}/${readableDate}/${userName}`;
@@ -743,6 +745,7 @@ export const writeToDatabaseNewSession = async (CurrId, CurrName) => {
   const promises = [
     set(ref(db, `_GameID/${gameId}/CurricularID`), CurrId),
     set(ref(db, `${userSession}/UserId`), userId),
+    set(ref(db, `${userSession}/UserRole`), userRole),
     set(ref(db, `${userSession}/${loginTime}/GameStart`), timestamp),
     set(ref(db, `${userSession}/${loginTime}/GameStartGMT`), timestampGMT),
     set(ref(db, `${userSession}/${loginTime}/DaRep`), 'null'),
@@ -768,12 +771,12 @@ export const writeToDatabasePoseStart = async (poseNumber, ConjectureId) => {
   conjectureId = ConjectureId;
 
   // Create a reference path to the Firebase Realtime Database
-  const userSession = `_GameID/${gameId}/${readableDate}/${userName}/${loginTime}/${conjectureId}/${poseNumber}`;
+  const userSession = `_GameID/${gameId}/${readableDate}/${userName}/${loginTime}/${conjectureId}`;
 
   // Create an object to send to the database
   const promises = [
-    set(ref(db, `${userSession}/Start/`), timestamp),
-    set(ref(db, `${userSession}/StartGMT/`), timestampGMT),
+    set(ref(db, `${userSession}/${poseNumber} Begin`), timestamp),
+    set(ref(db, `${userSession}/${poseNumber} Begin GMT`), timestampGMT),
   ];
 
   // Return the promise that push() returns
@@ -788,12 +791,12 @@ export const writeToDatabasePoseMatch = async (poseNumber) => {
   const timestampGMT = dateObj.toUTCString();
 
   // Create a reference to the Firebase Realtime Database
-  const userSession = `_GameID/${gameId}/${readableDate}/${userName}/${loginTime}/${conjectureId}/${poseNumber}`;
+  const userSession = `_GameID/${gameId}/${readableDate}/${userName}/${loginTime}/${conjectureId}`;
 
   // Create an object to send to the database
   const promises = [
-    set(ref(db, `${userSession}/Match/`), timestamp),
-    set(ref(db, `${userSession}/MatchGMT/`), timestampGMT),
+    set(ref(db, `${userSession}/${poseNumber} Match`), timestamp),
+    set(ref(db, `${userSession}/${poseNumber} Match GMT`), timestampGMT),
   ];
 
   // Return the promise that push() returns
@@ -811,12 +814,12 @@ export const writeToDatabaseIntuitionStart = async () => {
   eventType = "Intuition";
 
   // Create a reference to the Firebase Realtime Database
-  const userSession = `_GameID/${gameId}/${readableDate}/${userName}/${loginTime}/${conjectureId}/Intuition`;
+  const userSession = `_GameID/${gameId}/${readableDate}/${userName}/${loginTime}/${conjectureId}`;
 
   // Create an object to send to the database
   const promises = [
-    set(ref(db, `${userSession}/Start/`), timestamp),
-    set(ref(db, `${userSession}/StartGMT/`), timestampGMT),
+    set(ref(db, `${userSession}/Intuition Start`), timestamp),
+    set(ref(db, `${userSession}/Intuition Start GMT`), timestampGMT),
   ];
 
   // Return the promise that push() returns
@@ -834,12 +837,12 @@ export const writeToDatabaseIntuitionEnd = async () => {
   eventType = "Insight";
 
   // Create a reference to the Firebase Realtime Database
-  const userSession = `_GameID/${gameId}/${readableDate}/${userName}/${loginTime}/${conjectureId}/Intuition`;
+  const userSession = `_GameID/${gameId}/${readableDate}/${userName}/${loginTime}/${conjectureId}`;
 
   // Create an object to send to the database
   const promises = [
-    set(ref(db, `${userSession}/End/`), timestamp),
-    set(ref(db, `${userSession}/EndGMT/`), timestampGMT),
+    set(ref(db, `${userSession}/Intuition End/`), timestamp),
+    set(ref(db, `${userSession}/Intuition End GMT/`), timestampGMT),
   ];
 
   // Return the promise that push() returns
@@ -854,12 +857,12 @@ export const writeToDatabaseInsightStart = async () => {
   const timestampGMT = dateObj.toUTCString();
 
   // Create a reference to the Firebase Realtime Database
-  const userSession = `_GameID/${gameId}/${readableDate}/${userName}/${loginTime}/${conjectureId}//Insight`;
+  const userSession = `_GameID/${gameId}/${readableDate}/${userName}/${loginTime}/${conjectureId}`;
 
   // Create an object to send to the database
   const promises = [
-    set(ref(db, `${userSession}/Start/`), timestamp),
-    set(ref(db, `${userSession}/StartGMT/`), timestampGMT),
+    set(ref(db, `${userSession}/Insight Start/`), timestamp),
+    set(ref(db, `${userSession}/Insight Start GMT/`), timestampGMT),
   ];
 
   // Return the promise that push() returns
@@ -874,12 +877,12 @@ export const writeToDatabaseInsightEnd = async () => {
   const timestampGMT = dateObj.toUTCString();
 
   // Create a reference to the Firebase Realtime Database
-  const userSession = `_GameID/${gameId}/${readableDate}/${userName}/${loginTime}/${conjectureId}/Insight`;
+  const userSession = `_GameID/${gameId}/${readableDate}/${userName}/${loginTime}/${conjectureId}`;
 
   // Create an object to send to the database
   const promises = [
-    set(ref(db, `${userSession}/End/`), timestamp),
-    set(ref(db, `${userSession}/EndGMT/`), timestampGMT),
+    set(ref(db, `${userSession}/Insight End`), timestamp),
+    set(ref(db, `${userSession}/Insight End GMT`), timestampGMT),
   ];
 
   // Return the promise that push() returns
@@ -933,8 +936,7 @@ export const getFromDatabaseByGame = async (selectedGame, selectedStart, selecte
       // if(result.success) {
       //   const eventcsv = new Blob([result], { type: "text/csv" });
       //   const url = URL.createObjectURL(eventcsv);
-
-      //   const csvDownload = document.createElement("a");
+      //   const csvDownload = document.createElement('a');
       //   csvDownload.href = url;
       //   csvDownload.download = `${formattedGame}_event_log_${formattedStart}_to_${formattedEnd}.csv`; // Default file name
       //   csvDownload.click();
