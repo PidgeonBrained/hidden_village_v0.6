@@ -58,7 +58,7 @@ const formatDate = (date) => {
 // Define data keys for the text inputs of conjectures
 export const keysToPush = [
   "Conjecture Name",
-  //"Author Name",
+  "Author Name",
   "PIN",
   "Conjecture Keywords",
   "Conjecture Description",
@@ -454,6 +454,7 @@ export const writeToDatabaseCurricularDraft = async (UUID) => {
     set(ref(db, `${CurricularPath}/isFinal`), false),
     // auto set author for security
     set(ref(db, `${CurricularPath}/Author`), userName),
+    set(ref(db, `${CurricularPath}/AuthorID`), userId),
   ];
 
   return promises && alert("Game Draft saved");
@@ -515,7 +516,8 @@ export const writeToDatabaseCurricular = async (UUID) => {
     set(ref(db, `${CurricularPath}/UUID`), CurricularID),
     set(ref(db, `${CurricularPath}/isFinal`), true),
     // auto set author for security
-    set(ref(db, `${CurricularPath}/Author`), userName)
+    set(ref(db, `${CurricularPath}/Author`), userName),
+    set(ref(db, `${CurricularPath}/AuthorID`), userId),
   ];
 
   return alert("Game Published"), promises; //returns the promises and alerts that the game has been published
@@ -991,7 +993,7 @@ export const checkGameAuthorization = async (gameName) => {
 
     if (qSnapshot.exists()) {
       // If there is a game with this name, continue
-      const p = query(dbRef, orderByChild('CurricularAuthor'), equalTo(userName));
+      const p = query(dbRef, orderByChild('AuthorID'), equalTo(userId));
       const pSnapshopt = await get(p);
       // Only returns true if author matches current user
       if (pSnapshopt.exists()) {
@@ -1011,20 +1013,18 @@ export const checkGameAuthorization = async (gameName) => {
 export const getAuthorizedGameList = async () => {
   try {
     const dbRef = ref(db, 'Game');
-    const q = query(dbRef, orderByChild('CurricularAuthor'), equalTo(userName));
+    const q = query(dbRef, orderByChild('AuthorID'), equalTo(userId));
     const querySnapshot = await get(q);
     console.log("Query snapshot:", querySnapshot.val());
+
     if (querySnapshot.exists()) {
       // get all the conjectures in an array
       const authorizedCurricular = [];
 
       querySnapshot.forEach((authorizedCurricularSnapshot) => {
-        // console.log("Game data:", gameData);
-        // console.log("CurricularName:", gameData.CurricularName);
         // push name string into list of authorized games
         authorizedCurricular.push(authorizedCurricularSnapshot.val().CurricularName);
       })
-      // console.log("Final array:", authorizedCurricular);
       return authorizedCurricular;
 
     } else {
@@ -1079,105 +1079,3 @@ export const convertDateFormat = (dateStr) => {
     // Return the date string in the format 'yyyy-dd-mm'
     return `${year}-${month}-${day}`;
 };
-
-
-
-
-
-
-  // // ref the realtime db
-  // const dbRef = ref(db, `_PoseData/${selectedGame}`);
-
-  // ref.once('value')
-  //   .startAt(selectedStart)
-  //   .orderByKey()
-  //   .then((snapshot) => {
-  //     const querySnapshot = snapshot.val();
-  //     const queryJSON = JSON.stringify(querySnapshot, null, 2);
-  //     console.log('File successfully created');
-
-  //     const downloadLink = document.createElement('a');
-  //     downloadLink.setAttribute('href', 'data:text/json;charset=utf-8,' + encodeURIComponent(salesJson));
-  //     downloadLink.setAttribute('download', 'pose_data.json');
-
-  //   // Append the link to the DOM and click it
-  //     document.body.appendChild(downloadLink);
-  //     downloadLink.click();
-
-  //   // Remove the link from the DOM
-  //     document.body.removeChild(downloadLink);
-  //   })
-  //   .catch((error) => {
-  //     console.error('No data to download.', error)
-  //   })
-  // }
-//   // query to find data with the UUID
-//   const q = query(dbRef, orderByKey(), startAt(selectedStart), endAt(selectedEnd));
-//   const querySnapshot = await get(q);
-//   console.log(querySnapshot);
-//   // if (querySnapshot.exists()) {
-//   //     // get all the conjectures in an array
-//   //   const poseDataArray = [];
-//   //   querySnapshot.forEach((poseDataSnapshot) => {
-//   //     poseDataArray.push(poseDataSnapshot.val());
-//   //   });
-//   //   return poseDataArray; // return the data if its good
-//   // } else {
-//   //   console.log('no');
-//   //   return null; // This will happen if data not found
-//   // }
-// }
-
-  // const database = firebase.database();
-  // const ref = database.ref(`_PoseData/${selectedGame}`);
-//   ref.orderByKey()
-//     .startAt(selectedStart)
-//     .endAt(selectedEnd)
-//     .once('value')
-//     .then((snapshot) => {
-      
-//     })
-    
-//     });
-// }
-
-  // const startDateObj = new Date(selectedStart);
-  // const endDateObj = new Date(selectedEnd);
-  // const startMidnight = new Date(startDateObj.getFullYear(), startDateObj.getMonth(), startDateObj.getDate());
-  // const endMidnight = new Date(endDateObj.getFullYear(), endDateObj.getMonth(), endDateObj.getDate());
-  // const startUnix = Math.floor(startMidnight.getTime() / 1000);
-  // const endUnix = Math.floor(endMidnight.getTime() / 1000);
-
-  //   querySnapshot = await get(query);
-  
-  //   if (querySnapshot.exists()) {
-  //     // get all the conjectures in an array
-  //     const poseDataArray = [];
-  //     querySnapshot.forEach((poseDataSnapshot) => {
-  //       poseDataArray.push(poseDataSnapshot.val());
-  //     });
-  //     return poseDataArray; // return the data if its good
-  //   } else {
-  //     return null; // This will happen if data not found
-  //   }
-  // } catch (error) {
-  //   throw error;
-  // }
-
-//   get(child(db, `_PoseData/${selectedGame}/${selectedStart}`)).then((snapshot) => {
-//     if (snapshot.exists()) {
-//       const data = snapshot.val();
-//       fs.writeFileSync("firebase-data.json", JSON.stringify(data, null, 2));
-//       console.log("Data exported to firebase-data.json");
-//       console.log(snapshot.val());
-//     } else {
-//       console.log("No data available");
-//     }
-//   }).catch((error) => {
-//     console.error(error);
-//   });
-// };
-
-// export const clearFromDatabaseByGame = async () => {
-// };
-
