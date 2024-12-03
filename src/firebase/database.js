@@ -740,12 +740,12 @@ export const writeToDatabaseNewSession = async (CurrId, CurrName, role) => {
   userRole = role;
 
   // Create a reference path to the Firebase Realtime Database
-  const userSession = `_GameID/${gameId}/${readableDate}/${userName}`;
+  const userSession = `_GameData/${gameId}/${readableDate}/${userName}`;
 
   // Create an object to send to the database
   // Some of these are placeholders for future values that aren't implemented yet i.e. Hints
   const promises = [
-    set(ref(db, `_GameID/${gameId}/CurricularID`), CurrId),
+    set(ref(db, `_GameData/${gameId}/CurricularID`), CurrId),
     set(ref(db, `${userSession}/UserId`), userId),
     set(ref(db, `${userSession}/UserRole`), userRole),
     set(ref(db, `${userSession}/${loginTime}/GameStart`), timestamp),
@@ -773,7 +773,7 @@ export const writeToDatabasePoseStart = async (poseNumber, ConjectureId) => {
   conjectureId = ConjectureId;
 
   // Create a reference path to the Firebase Realtime Database
-  const userSession = `_GameID/${gameId}/${readableDate}/${userName}/${loginTime}/${conjectureId}`;
+  const userSession = `_GameData/${gameId}/${readableDate}/${userName}/${loginTime}/${conjectureId}`;
 
   // Create an object to send to the database
   const promises = [
@@ -793,7 +793,7 @@ export const writeToDatabasePoseMatch = async (poseNumber) => {
   const timestampGMT = dateObj.toUTCString();
 
   // Create a reference to the Firebase Realtime Database
-  const userSession = `_GameID/${gameId}/${readableDate}/${userName}/${loginTime}/${conjectureId}`;
+  const userSession = `_GameData/${gameId}/${readableDate}/${userName}/${loginTime}/${conjectureId}`;
 
   // Create an object to send to the database
   const promises = [
@@ -816,7 +816,7 @@ export const writeToDatabaseIntuitionStart = async () => {
   eventType = "Intuition";
 
   // Create a reference to the Firebase Realtime Database
-  const userSession = `_GameID/${gameId}/${readableDate}/${userName}/${loginTime}/${conjectureId}`;
+  const userSession = `_GameData/${gameId}/${readableDate}/${userName}/${loginTime}/${conjectureId}`;
 
   // Create an object to send to the database
   const promises = [
@@ -839,7 +839,7 @@ export const writeToDatabaseIntuitionEnd = async () => {
   eventType = "Insight";
 
   // Create a reference to the Firebase Realtime Database
-  const userSession = `_GameID/${gameId}/${readableDate}/${userName}/${loginTime}/${conjectureId}`;
+  const userSession = `_GameData/${gameId}/${readableDate}/${userName}/${loginTime}/${conjectureId}`;
 
   // Create an object to send to the database
   const promises = [
@@ -859,7 +859,7 @@ export const writeToDatabaseInsightStart = async () => {
   const timestampGMT = dateObj.toUTCString();
 
   // Create a reference to the Firebase Realtime Database
-  const userSession = `_GameID/${gameId}/${readableDate}/${userName}/${loginTime}/${conjectureId}`;
+  const userSession = `_GameData/${gameId}/${readableDate}/${userName}/${loginTime}/${conjectureId}`;
 
   // Create an object to send to the database
   const promises = [
@@ -879,7 +879,7 @@ export const writeToDatabaseInsightEnd = async () => {
   const timestampGMT = dateObj.toUTCString();
 
   // Create a reference to the Firebase Realtime Database
-  const userSession = `_GameID/${gameId}/${readableDate}/${userName}/${loginTime}/${conjectureId}`;
+  const userSession = `_GameData/${gameId}/${readableDate}/${userName}/${loginTime}/${conjectureId}`;
 
   // Create an object to send to the database
   const promises = [
@@ -896,7 +896,7 @@ export const getFromDatabaseByGame = async (selectedGame, selectedStart, selecte
   try {
     // Create reference to the realtime database
     const posedbRef = ref(db, `_PoseData/${selectedGame}`);
-    const eventdbRef = ref(db, `_GameID/${selectedGame}`);
+    const eventdbRef = ref(db, `_GameData/${selectedGame}`);
 
     // Query to find data
     const poseq = query(posedbRef, orderByKey(), startAt(selectedStart), endAt(selectedEnd));
