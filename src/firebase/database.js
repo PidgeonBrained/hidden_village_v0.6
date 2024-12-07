@@ -932,18 +932,6 @@ export const getFromDatabaseByGame = async (selectedGame, selectedStart, selecte
       document.body.appendChild(poseDownload);
       poseDownload.click();
       document.body.removeChild(poseDownload);
-
-      // const eventjsonTOcsv = JSON.parse(eventjsonStr);
-      const result = await convertJsonToCsv(eventjsonStr);
-      // if(result.success) {
-      //   const eventcsv = new Blob([result], { type: "text/csv" });
-      //   const url = URL.createObjectURL(eventcsv);
-      //   const csvDownload = document.createElement('a');
-      //   csvDownload.href = url;
-      //   csvDownload.download = `${formattedGame}_event_log_${formattedStart}_to_${formattedEnd}.csv`; // Default file name
-      //   csvDownload.click();
-      //   URL.revokeObjectURL(url);
-      // }
       
     } else {
       return null; // This will happen if data not found
