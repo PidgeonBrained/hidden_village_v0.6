@@ -1,6 +1,6 @@
 
 
-export async function convertJsonToCsv(jsonFile) {
+export async function convertJsonToCsv(jsonFile, formattedGame, formattedStart, formattedEnd) {
     try {
         // Read JSON file content
         //const fileContent = await jsonFile.text();
@@ -92,7 +92,7 @@ export async function convertJsonToCsv(jsonFile) {
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = `data_export_${new Date().toISOString()}.csv`;
+        link.download = `${formattedgame}_event_log_${formattedStart}_to_${formattedEnd}.csv`;
         link.click();
         URL.revokeObjectURL(url);
 
