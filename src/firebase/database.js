@@ -1090,22 +1090,6 @@ export const checkDateFormat = (dateStr) => {
     return false;
     
   }
-
-  // Split the date string into parts
-  const separator = dateStr.includes('/') ? '/' : '-';
-  const [month, day, year] = dateStr.split(separator);
-  
-  // Create a date object from the parts
-  const dateObj = new Date(`${year}-${month}-${(parseInt(day) + 1).toString()}`);
- 
-  // Check if the date object is valid
-  if (dateObj.getFullYear() < 2000 ||
-    dateObj.getFullYear() !== parseInt(year) || 
-      dateObj.getMonth() + 1 !== parseInt(month) || 
-      dateObj.getDate() !== parseInt(day)) {
-    return false;
-  }
-  return true;
 };
 
 export const convertDateFormat = (dateStr) => {
