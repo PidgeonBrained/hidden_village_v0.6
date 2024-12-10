@@ -36,17 +36,15 @@ const ConjecturePoseContainer = (props) => {
     useEffect(() => {
         // // Defaults recording conditions true and fps = 12.
     
-        // // Get the recording parameter from the URL. If it's not set, default to false.
         const isRecording = "true";
         
-        // If the recording param is set to true, begin writing data to the database.
         if (isRecording === "true") {
-          // Get the fps parameter from the URL. If it's not set, default to 30.
+          // Get the fps parameter: default 12
 
 
           //FRAMERATE CAN BE CHANGED HERE
-          const fpsUrlParam = 12;
-    
+          const frameRate = 12;
+
 
           
           // Empty array to hold promise objects assures that all the promises get settled on component unmount.
@@ -58,12 +56,12 @@ const ConjecturePoseContainer = (props) => {
             // Call the writeToDatabase function with the current poseData, conjecture index,
             // and fps parameter. Push the resulting promise object to the promises array.
             promises.push(
-              writeToDatabase(poseData, UUID, fpsUrlParam)
+              writeToDatabase(poseData, UUID, frameRate)
             );
             // Call the promiseChecker function to detect any data loss in the promises array
             // and trigger an alert if necessary.
-            promiseChecker(fpsUrlParam, promises);
-        }, 1000 / fpsUrlParam);
+            promiseChecker(frameRate, promises);
+        }, 1000 / frameRate);
     
           // The code below runs when the component unmounts.
         return async () => {
