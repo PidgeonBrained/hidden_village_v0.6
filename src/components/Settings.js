@@ -64,7 +64,7 @@ const Settings = ({ width, height, x, y, onClose }) => {
 
       {/* Title */}
       <Text
-        text={"SETTINGS"}
+        text={"SETTINGS           The Method  doesn't implemnted"}
         style={{
           fontFamily: "Arial",
           fontSize: 24,
