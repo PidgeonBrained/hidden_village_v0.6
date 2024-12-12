@@ -1,5 +1,5 @@
 // Firebase Init
-import { ref, push, getDatabase, set, query, equalTo, get, orderByChild, orderByKey, onValue, child, startAt, endAt, remove } from "firebase/database";
+import { ref, push, getDatabase, set, query, equalTo, get, orderByChild, orderByKey, onValue, child, startAt, endAt, remove, update } from "firebase/database";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 import { Curriculum } from "../components/CurricularModule/CurricularModule";
@@ -761,6 +761,10 @@ export const writeToDatabaseNewSession = async (CurrId, CurrName, role) => {
   return promises;
 };
 
+export const removeData = async () => {
+  const db = 0;
+}
+
 // Write timestamp for pose start to the database
 export const writeToDatabasePoseStart = async (poseNumber, ConjectureId) => {
   // Create a new date object to get a timestamp
@@ -962,12 +966,12 @@ export const getFromDatabaseByGameCSV = async (selectedGame, selectedStart, sele
       
       // // Convert event log to JSON and download CSV
       const eventjsonStr = JSON.stringify(eventData, null, 2);
-      const eventDownload = document.createElement('a');
-      eventDownload.setAttribute('href', 'data:text/json;charset=utf-8,' + encodeURIComponent(eventjsonStr));
-      eventDownload.setAttribute('download', `${formattedGame}_event_log_${formattedStart}_to_${formattedEnd}.json`);
-      document.body.appendChild(eventDownload);
-      eventDownload.click();
-      document.body.removeChild(eventDownload);
+      // const eventDownload = document.createElement('a');
+      // eventDownload.setAttribute('href', 'data:text/json;charset=utf-8,' + encodeURIComponent(eventjsonStr));
+      // eventDownload.setAttribute('download', `${formattedGame}_event_log_${formattedStart}_to_${formattedEnd}.json`);
+      // document.body.appendChild(eventDownload);
+      // eventDownload.click();
+      // document.body.removeChild(eventDownload);
 
       const result = await convertJsonToCsv(eventjsonStr, formattedGame, formattedStart, formattedEnd);
       
@@ -983,7 +987,6 @@ export const removeFromDatabaseByGame = async (selectedGame, selectedStart, sele
   try {
     // Create reference to the realtime database
     const dbRef = ref(db, `_PoseData/${selectedGame}`);
-
     // Query to find data
     const q = query(dbRef, orderByKey(), startAt(selectedStart), endAt(selectedEnd));
     
@@ -1007,7 +1010,7 @@ export const removeFromDatabaseByGame = async (selectedGame, selectedStart, sele
       return { success: false, message: 'No data to remove.' };
     }
   } catch (error) {
-    throw error; // this is an actual bad thing
+    throw error;
   }
 };
 

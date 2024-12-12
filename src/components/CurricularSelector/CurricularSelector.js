@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Background from "../Background";
 import { blue, white, red, neonGreen,green, black } from "../../utils/colors";
 import RectButton from "../RectButton";
-import { getCurricularList, writeToDatabaseGameSelect, writeToDatabaseNewSession } from "../../firebase/database";
+import { getCurricularList, writeToDatabaseGameSelect, writeToDatabaseNewSession, removeFromDatabaseByGame } from "../../firebase/database";
 import { getUserNameFromDatabase, getUserRoleFromDatabase } from "../../firebase/userDatabase";
 import { CurricularSelectorBoxes } from "./CurricularSelectorModuleBoxes";
 import { useMachine } from "@xstate/react";

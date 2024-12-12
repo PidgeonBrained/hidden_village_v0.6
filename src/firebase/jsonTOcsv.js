@@ -92,7 +92,7 @@ export async function convertJsonToCsv(jsonFile, formattedGame, formattedStart, 
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = `${formattedgame}_event_log_${formattedStart}_to_${formattedEnd}.csv`;
+        link.download = `${formattedGame}_event_log_${formattedStart}_to_${formattedEnd}.csv`;
         link.click();
         URL.revokeObjectURL(url);
 
